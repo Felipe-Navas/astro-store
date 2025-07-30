@@ -13,7 +13,13 @@
     "@astrojs/vercel": "^8.2.3",
     "@tailwindcss/vite": "^4.1.11",
     "astro": "^5.12.5",
+    "bcryptjs": "^3.0.2",
     "sweetalert2": "^11.22.2",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "uuid": "^11.1.0"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^3.0.0",
+    "@types/uuid": "^10.0.0"
   }
 }
