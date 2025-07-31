@@ -6,8 +6,9 @@
 interface User {
   name: string;
   email: string;
-  avatar: string;
-  emailVerified: boolean;
+  // TODO
+  // avatar: string;
+  // emailVerified: boolean;
 }
 
 declare namespace App {
