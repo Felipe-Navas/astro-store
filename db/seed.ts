@@ -1,4 +1,4 @@
-import { db, Role, User } from 'astro:db'
+import { db, Role, User, Product, ProductImage } from 'astro:db'
 import { v4 as UUID } from 'uuid'
 import bcrypt from 'bcryptjs'
 
@@ -26,4 +26,6 @@ export default async function seed() {
 
   await db.insert(Role).values(roles)
   await db.insert(User).values([johnDoe, janeDoe])
+
+
 }
