@@ -13,8 +13,34 @@ const User = defineTable({
 
 const Role = defineTable({
   columns: {
-    id: column.text({ primary: true, unique: true }),
+    id: column.text({ primaryKey: true }),
     name: column.text(),
+  },
+})
+
+const Product = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    description: column.text(),
+    gender: column.text(),
+    price: column.number(),
+    sizes: column.text(),
+    slug: column.text(),
+    stock: column.number(),
+    tags: column.text(),
+    title: column.text(),
+    type: column.text(),
+
+    user: column.text({ references: () => User.columns.id }),
+  },
+})
+
+const ProductImage = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    image: column.text(),
+
+    productId: column.text({ references: () => Product.columns.id }),
   },
 })
 
@@ -22,5 +48,7 @@ export default defineDb({
   tables: {
     User,
     Role,
+    Product,
+    ProductImage,
   },
 })
