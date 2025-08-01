@@ -25,7 +25,7 @@ const Product = defineTable({
     gender: column.text(),
     price: column.number(),
     sizes: column.text(),
-    slug: column.text(),
+    slug: column.text({ unique: true }),
     stock: column.number(),
     tags: column.text(),
     title: column.text(),
