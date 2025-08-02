@@ -1,19 +1,19 @@
 ---
 import MainLayout from '@/layouts/MainLayout.astro'
+import { actions } from 'astro:actions'
 
-import { getSession } from 'auth-astro/server'
+const { data: products, error } = await Astro.callAction(
+  actions.getProductsByPage,
+  {}
+)
 
-const session = await getSession(Astro.request)
+if (error) {
+  console.error(error)
+  // return Astro.redirect('/')
+}
 
-const { user } = session ?? {}
 ---
 
 <MainLayout>
   <h1 class="text-3xl">Home Page</h1>
-
-  <pre>
-    <code>
-      {JSON.stringify(user, null, 2)}
-    </code>
-  </pre>
 </MainLayout>
