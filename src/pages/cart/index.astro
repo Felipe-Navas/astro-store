@@ -1,0 +1,11 @@
+---
+import MainLayout from '@/layouts/MainLayout.astro'
+
+const cart = Astro.cookies.get('cart')
+---
+
+<MainLayout title="Carrito">
+  <h1>Carrito</h1>
+
+  <code>{JSON.stringify(cart, null, 2)}</code>
+</MainLayout>
