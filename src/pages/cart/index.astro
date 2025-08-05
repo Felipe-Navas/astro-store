@@ -1,11 +1,29 @@
 ---
 import MainLayout from '@/layouts/MainLayout.astro'
+import { actions } from 'astro:actions'
 
-const cart = Astro.cookies.get('cart')
+// * Este codigo se usaba cuando daba error o que la cookie esta undefined
+// const productsInCartCookie = Astro.cookies.get('cart')?.json() ?? []
+// const { data: products, error } = await Astro.callAction(
+//   actions.loadProductsFromCart,
+//   productsInCartCookie
+// )
+
+const { data: products, error } = await Astro.callAction(
+  actions.loadProductsFromCart,
+  {}
+)
+
+if (error) {
+  console.error(error)
+  return Astro.redirect('/')
+}
+
+console.log("🚀 ~ products:", products)
 ---
 
 <MainLayout title="Carrito">
   <h1>Carrito</h1>
 
-  <code>{JSON.stringify(cart, null, 2)}</code>
+
 </MainLayout>
