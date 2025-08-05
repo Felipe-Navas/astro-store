@@ -5,7 +5,10 @@ import { actions } from 'astro:actions'
 
 const { slug } = Astro.params
 
-const { data, error } = await Astro.callAction(actions.getProductBySlug, slug ?? '')
+const { data, error } = await Astro.callAction(
+  actions.getProductBySlug,
+  slug ?? ''
+)
 
 if (error) {
   console.error(error)
@@ -13,14 +16,9 @@ if (error) {
 }
 
 const { product, images } = data
-
-
 ---
 
-<MainLayout
-  title={product.title}
-  description={product.description}
-  >
+<MainLayout title={product.title} description={product.description}>
   <!-- image={image} -->
 
   <!-- <h1>{product.title}</h1> -->
@@ -44,7 +42,7 @@ const { product, images } = data
       <h3 class="mt-5">Cantidad</h3>
       <div>
         <button class="btn-quantity">-</button>
-        <input type="number" min="1" value="1" />
+        <input id="quantity" type="number" min="1" value="1" />
         <button class="btn-quantity">+</button>
       </div>
 
@@ -59,6 +57,54 @@ const { product, images } = data
 
   <input type="hidden" id="product-id" value={product.id} />
 </MainLayout>
+
+<script>
+  const sizeElements = document.querySelectorAll('li')
+
+  sizeElements.forEach((liElement) => {
+    liElement.addEventListener('click', () => {
+      sizeElements.forEach((s) => s.classList.remove('selected-size'))
+
+      liElement.classList.add('selected-size')
+    })
+  })
+
+  const quantityInput = document.querySelector('#quantity') as HTMLInputElement
+  const productIdInput = document.querySelector(
+    '#product-id'
+  ) as HTMLInputElement
+
+  let quantity = 1
+
+  const [decrementButton, incrementButton, addToCartButton] =
+    document.querySelectorAll('button')
+
+  incrementButton.addEventListener('click', () => {
+    quantity = Math.min(quantity + 1, 5) // 5 productos maximos
+    quantityInput.value = quantity.toString()
+  })
+
+  decrementButton.addEventListener('click', () => {
+    quantity = Math.max(quantity - 1, 1) // 1 producto minimo
+    quantityInput.value = quantity.toString()
+  })
+
+
+  addToCartButton.addEventListener('click', () => {
+    const size = document.querySelector('.selected-size')?.textContent
+
+    if (!size) {
+      return alert('Selecciona una talla')
+    }
+
+    addToCartButton.disabled = true
+
+    const productId = productIdInput.value
+    const quantity = quantityInput.value
+    console.log(productId, quantity, size)
+  })
+
+</script>
 
 <style>
   @reference '@/styles/global.css';
