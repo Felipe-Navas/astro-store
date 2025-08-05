@@ -46,7 +46,8 @@ const { product, images } = data
         <button class="btn-quantity">+</button>
       </div>
 
-      <button class="mt-5 bg-blue-500 text-white p-3 w-full disabled:bg-gray-500"
+      <button
+        class="mt-5 bg-blue-500 text-white p-3 w-full disabled:bg-gray-500"
         >Añadir al carrito</button
       >
 
@@ -59,6 +60,8 @@ const { product, images } = data
 </MainLayout>
 
 <script>
+  import { CartCookiesClient } from '@/utils'
+
   const sizeElements = document.querySelectorAll('li')
 
   sizeElements.forEach((liElement) => {
@@ -89,7 +92,6 @@ const { product, images } = data
     quantityInput.value = quantity.toString()
   })
 
-
   addToCartButton.addEventListener('click', () => {
     const size = document.querySelector('.selected-size')?.textContent
 
@@ -99,11 +101,14 @@ const { product, images } = data
 
     addToCartButton.disabled = true
 
-    const productId = productIdInput.value
-    const quantity = quantityInput.value
-    console.log(productId, quantity, size)
-  })
+    CartCookiesClient.addItem({
+      productId: productIdInput.value,
+      size: size,
+      quantity: quantity,
+    })
 
+    window.location.href = '/cart'
+  })
 </script>
 
 <style>
