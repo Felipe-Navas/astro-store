@@ -17,6 +17,11 @@ if (error) {
 }
 
 const { products, totalPages } = data
+
+if (products.length === 0) {
+  return Astro.redirect(`/?page=${totalPages}`)
+}
+
 ---
 
 <MainLayout>
