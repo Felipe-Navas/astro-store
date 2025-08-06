@@ -20,7 +20,10 @@ if (error) {
   return Astro.redirect('/')
 }
 
-const total = products.reduce((acc, product) => acc + product.price * product.quantity, 0)
+const total = products.reduce(
+  (acc, product) => acc + product.price * product.quantity,
+  0
+)
 ---
 
 <MainLayout title="Carrito">
@@ -54,7 +57,11 @@ const total = products.reduce((acc, product) => acc + product.price * product.qu
                 Talla: <span class="font-bold">{product.size}</span>
               </p>
 
-              <button class="hover:underline text-blue-500 btn-delete cursor-pointer">
+              <button
+                data-id={product.productId}
+                data-size={product.size}
+                class="hover:underline text-blue-500 btn-delete cursor-pointer"
+              >
                 Remover
               </button>
             </div>
@@ -93,3 +100,24 @@ const total = products.reduce((acc, product) => acc + product.price * product.qu
     </div>
   </section>
 </MainLayout>
+
+<script>
+import { CartCookiesClient } from "@/utils"
+
+  const deleteButtons: NodeListOf<HTMLButtonElement> =
+    document.querySelectorAll('.btn-delete')
+
+    deleteButtons.forEach((button) => {
+      button.addEventListener('click', (event) => {
+
+        const target = event.target as HTMLButtonElement
+        const productId = target.dataset.id ?? ''
+        const size = target.dataset.size ?? ''
+
+        CartCookiesClient.removeItem(productId, size)
+
+        window.location.reload()
+
+      })
+    })
+</script>
