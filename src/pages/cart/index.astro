@@ -102,22 +102,27 @@ const total = products.reduce(
 </MainLayout>
 
 <script>
-import { CartCookiesClient } from "@/utils"
+  import { itemsInCart } from '@/store'
+  import { CartCookiesClient } from '@/utils'
+  import { navigate } from 'astro:transitions/client'
 
-  const deleteButtons: NodeListOf<HTMLButtonElement> =
-    document.querySelectorAll('.btn-delete')
+  document.addEventListener('astro:page-load', () => {
+    const deleteButtons: NodeListOf<HTMLButtonElement> =
+      document.querySelectorAll('.btn-delete')
 
     deleteButtons.forEach((button) => {
-      button.addEventListener('click', (event) => {
-
+      button.addEventListener('click', async (event) => {
         const target = event.target as HTMLButtonElement
         const productId = target.dataset.id ?? ''
         const size = target.dataset.size ?? ''
 
-        CartCookiesClient.removeItem(productId, size)
+        const cart = CartCookiesClient.removeItem(productId, size)
 
-        window.location.reload()
+        itemsInCart.set(cart.length)
 
+        // window.location.reload()
+        await navigate('/cart')
       })
     })
+  })
 </script>
