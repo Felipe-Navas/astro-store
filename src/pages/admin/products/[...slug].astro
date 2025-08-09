@@ -239,11 +239,11 @@ const { product, images } = data
             {
               images.map((image) => (
                 <tr class="border">
-                  <td class="flex justify-center">
+                  <td class="flex justify-center p-4">
                     <ProductImage
                       src={image}
                       alt={product.title}
-                      className="w-16 h-16 rounded"
+                      className="w-16 h-16 rounded object-contain"
                     />
                   </td>
                   <td class="text-center">

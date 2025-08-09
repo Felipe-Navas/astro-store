@@ -62,16 +62,45 @@ export const createUpdateProduct = defineAction({
       ...rest,
     }
 
+    const queries: any = []
+
     if (!form.id) {
-      await db.insert(Product).values(product)
+      queries.push(db.insert(Product).values(product))
     } else {
-      await db.update(Product).set(product).where(eq(Product.id, id))
+      queries.push(db.update(Product).set(product).where(eq(Product.id, id)))
     }
 
-    imageFiles?.forEach(async (imageFile) => {
-      if (imageFile.size <= 0) return
-      await ImageUpload.upload(imageFile)
+    // imageFiles?.forEach(async (imageFile) => {
+    //   if (imageFile.size <= 0) return
+
+    //   const url = await ImageUpload.upload(imageFile)
+    // })
+
+    // Better way to do the upload images to run in parallel
+    let secureUrls: string[] = []
+    if (
+      form.imageFiles &&
+      form.imageFiles.length > 0 &&
+      form.imageFiles[0].size > 0
+    ) {
+      const urls = await Promise.all(
+        form.imageFiles.map((file) => ImageUpload.upload(file))
+      )
+
+      secureUrls.push(...urls)
+    }
+
+    secureUrls.forEach((imageUrl) => {
+      const imageObj = {
+        id: UUID(),
+        image: imageUrl,
+        productId: product.id,
+      }
+
+      queries.push(db.insert(ProductImage).values(imageObj))
     })
+
+    await db.batch(queries)
 
     return product
   },
