@@ -8,4 +8,5 @@
 4. Fill the .env file with your own values.
 5. Run `npm run dev` to start the dev server.
 
+To run the seed directly on turso, run `bunx astro db execute db/seed.ts --remote`.
 
