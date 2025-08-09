@@ -221,6 +221,7 @@ const { product, images } = data
               type="file"
               accept="image/*"
               multiple
+              class="hidden"
             />
           </label>
         </div>
@@ -330,8 +331,62 @@ const { product, images } = data
       })
     })
 
+    // Drag and drop
+    const lblSelectedFiles = document.querySelector(
+      '#lbl-selected-files'
+    ) as HTMLParagraphElement
+    const dropZone = document.querySelector('#drop-zone') as HTMLDivElement
+    const fileInput = document.querySelector('#file-upload') as HTMLInputElement
 
+    const preventDefaults = (e: DragEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+    }
 
+    const highLightDropZone = (e: DragEvent) => {
+      dropZone.classList.add('border-blue-500', 'bg-blue-50')
+    }
 
+    const unHighLightDropZone = (e: DragEvent) => {
+      dropZone.classList.remove('border-blue-500', 'bg-blue-50')
+    }
+
+    const createFileList = (files: File[]): FileList => {
+      const dataTransfer = new DataTransfer()
+      files.forEach((file) => dataTransfer.items.add(file))
+      return dataTransfer.files
+    }
+
+    const handleFilesDrop = async (files: FileList) => {
+      const validFiles = Array.from(files).filter((file) =>
+        file.type.startsWith('image/')
+      )
+
+      if (fileInput && validFiles.length > 0) {
+        fileInput.files = createFileList(validFiles)
+      }
+
+      lblSelectedFiles.innerHTML = `<strong>${validFiles.length}</strong> archivos seleccionados`
+    }
+
+    ;(['dragenter', 'dragover', 'dragleave', 'drop'] as const).forEach(
+      (eventName) => {
+        dropZone.addEventListener(eventName, preventDefaults)
+        document.body.addEventListener(eventName, preventDefaults)
+      }
+    )
+    ;(['dragenter', 'dragover'] as const).forEach((eventName) => {
+      dropZone.addEventListener(eventName, highLightDropZone)
+    })
+    ;(['dragleave', 'drop'] as const).forEach((eventName) => {
+      dropZone.addEventListener(eventName, unHighLightDropZone)
+    })
+
+    dropZone.addEventListener('drop', async (e) => {
+      const files = e.dataTransfer?.files
+      if (files) {
+        handleFilesDrop(files)
+      }
+    })
   })
 </script>
