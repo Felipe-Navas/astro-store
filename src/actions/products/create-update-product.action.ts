@@ -3,6 +3,16 @@ import { defineAction } from 'astro:actions'
 import { db, eq, Product, ProductImage } from 'astro:db'
 import { getSession } from 'auth-astro/server'
 import { v4 as UUID } from 'uuid'
+import { ImageUpload } from '@/utils/image-upload'
+
+const MAX_FILE_SIZE = 5_000_000 // 5MB
+const ACCEPTED_IMAGE_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+  'image/svg+xml',
+]
 
 export const createUpdateProduct = defineAction({
   accept: 'form',
@@ -18,7 +28,18 @@ export const createUpdateProduct = defineAction({
     title: z.string(),
     type: z.string(),
 
-    // TODO: Add image
+    imageFiles: z
+      .array(
+        z
+          .instanceof(File)
+          .refine((file) => file.size <= MAX_FILE_SIZE, 'Max image size 5MB')
+          .refine((file) => {
+            if (file.size === 0) return true
+
+            return ACCEPTED_IMAGE_TYPES.includes(file.type)
+          }, `Only (${ACCEPTED_IMAGE_TYPES.join(', ')}) files are allowed`)
+      )
+      .optional(),
   }),
   handler: async (form, { request }) => {
     const session = await getSession(request)
@@ -30,7 +51,7 @@ export const createUpdateProduct = defineAction({
 
     // TODO controlar si el usuario tiene permisos, o hacerlo en el middleware
 
-    const { id = UUID(), ...rest } = form
+    const { id = UUID(), imageFiles, ...rest } = form
 
     rest.slug = rest.slug.toLowerCase().replaceAll(' ', '-').trim()
 
@@ -46,6 +67,11 @@ export const createUpdateProduct = defineAction({
     } else {
       await db.update(Product).set(product).where(eq(Product.id, id))
     }
+
+    imageFiles?.forEach(async (imageFile) => {
+      if (imageFile.size <= 0) return
+      await ImageUpload.upload(imageFile)
+    })
 
     return product
   },
