@@ -3,6 +3,7 @@ import ProductImage from '@/components/products/ProductImage.astro'
 import ProductSlideshow from '@/components/products/ProductSlideshow.astro'
 import MainLayout from '@/layouts/MainLayout.astro'
 import { actions } from 'astro:actions'
+import { inferRemoteSize } from 'astro:assets'
 
 const { slug } = Astro.params
 
@@ -24,7 +25,6 @@ const { product, images } = data
   <a href="javascript:history.back()" class="text-blue-500">← Volver</a>
 
   <form class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
     <input type="hidden" name="id" value={product.id} />
 
     <!-- Datos generales -->
@@ -226,7 +226,7 @@ const { product, images } = data
         </div>
 
         <!-- Slideshow -->
-        <ProductSlideshow images={images} />
+        <ProductSlideshow images={images.map((i) => i.image)} />
 
         <table class="w-full border my-10">
           <thead>
@@ -237,8 +237,8 @@ const { product, images } = data
           </thead>
           <tbody>
             {
-              images.map((image) => (
-                <tr class="border">
+              images.map(({ image, id }) => (
+                <tr class="border" id={id}>
                   <td class="flex justify-center p-4">
                     <ProductImage
                       src={image}
@@ -247,7 +247,9 @@ const { product, images } = data
                     />
                   </td>
                   <td class="text-center">
-                    <button class="btn-delete-image">X</button>
+                    <button type="button" data-id={id} class="btn-delete-image">
+                      X
+                    </button>
                   </td>
                 </tr>
               ))
@@ -307,5 +309,29 @@ const { product, images } = data
 
       navigate(`/admin/products/${data.slug}`)
     })
+
+    // Delete image
+    const deleteImageButtons = document.querySelectorAll('.btn-delete-image')
+
+    deleteImageButtons.forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const id = btn.getAttribute('data-id')
+        if (!id) return
+
+        const { data, error } = await actions.deleteProductImage(id)
+        if (error) {
+          console.error(error)
+          return
+        }
+
+        const escapedId = CSS.escape(id)
+        const trId = `#${escapedId}`
+        document.querySelector(trId)?.remove()
+      })
+    })
+
+
+
+
   })
 </script>
